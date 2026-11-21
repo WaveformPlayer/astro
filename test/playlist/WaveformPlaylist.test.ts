@@ -18,7 +18,7 @@
  * No browser, no jsdom — Astro renders to a string and we parse the
  * resulting markup directly.
  *
- * @see ../src/WaveformPlaylist.astro
+ * @see ../../src/playlist/WaveformPlaylist.astro
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
@@ -26,8 +26,8 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 // factories. The container API wants its own `AstroComponentFactory` type
 // (an Astro internal). Cast at the import boundary — this is test-only and
 // not part of the public type surface.
-import WaveformPlaylistRaw from '../src/WaveformPlaylist.astro';
-import type { WaveformPlaylistProps } from '../src/types';
+import WaveformPlaylistRaw from '../../src/playlist/WaveformPlaylist.astro';
+import type { WaveformPlaylistProps } from '../../src/playlist/types';
 
 const WaveformPlaylist = WaveformPlaylistRaw as Parameters<
 	AstroContainer['renderToString']

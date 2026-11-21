@@ -14,7 +14,7 @@
  *
  * The round trip through the real core lives in `forwarding-drift.test.ts`.
  *
- * @see ../src/WaveformSounds.astro
+ * @see ../../src/sounds/WaveformSounds.astro
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -23,8 +23,8 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { renderSounds } from '@arraypress/waveform-sounds/render';
 // Cast at the import boundary: the shim in src/astro-shim.d.ts models
 // `.astro` imports as opaque factories.
-import WaveformSoundsRaw from '../src/WaveformSounds.astro';
-import type { WaveformSoundsProps, SoundInput } from '../src/types';
+import WaveformSoundsRaw from '../../src/sounds/WaveformSounds.astro';
+import type { WaveformSoundsProps, SoundInput } from '../../src/sounds/types';
 
 const WaveformSounds = WaveformSoundsRaw as Parameters<AstroContainer['renderToString']>[0];
 
@@ -364,7 +364,7 @@ describe('<WaveformSounds> — client script', () => {
 	});
 
 	it('the component source has no is:inline / define:vars script', () => {
-		const src = readFileSync(resolve(process.cwd(), 'src/WaveformSounds.astro'), 'utf8');
+		const src = readFileSync(resolve(process.cwd(), 'src/sounds/WaveformSounds.astro'), 'utf8');
 		const template = src.slice(src.lastIndexOf('---') + 3);
 		expect(template).not.toMatch(/is:inline|define:vars/);
 		expect(template).toMatch(/<script>\s*import '\.\/client';\s*<\/script>/);

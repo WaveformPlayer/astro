@@ -17,7 +17,7 @@
  */
 import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import WaveformSoundsRaw from '../src/WaveformSounds.astro';
+import WaveformSoundsRaw from '../../src/sounds/WaveformSounds.astro';
 import type { WaveformSounds as WaveformSoundsClass } from '@arraypress/waveform-sounds';
 import { SOUNDS_OPTIONS, isCallback } from './option-surface';
 import { installDom } from './dom';

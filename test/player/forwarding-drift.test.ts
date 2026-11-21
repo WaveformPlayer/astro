@@ -18,7 +18,7 @@
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import WaveformPlayerRaw from '../src/WaveformPlayer.astro';
+import WaveformPlayerRaw from '../../src/player/WaveformPlayer.astro';
 import {
 	isCallbackKey,
 	loadCoreOptionKeys,

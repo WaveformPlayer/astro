@@ -17,7 +17,7 @@
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import WaveformPlaylistRaw from '../src/WaveformPlaylist.astro';
+import WaveformPlaylistRaw from '../../src/playlist/WaveformPlaylist.astro';
 import { ALL_OPTIONS, PLAYER_OPTIONS, PLAYLIST_OPTIONS, isCallback } from './option-surface';
 
 const WaveformPlaylist = WaveformPlaylistRaw as Parameters<

@@ -14,8 +14,8 @@
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import WaveformBarRaw from '../src/WaveformBar.astro';
-import type { WaveformBarConfig, WaveformBarProps } from '../src/types';
+import WaveformBarRaw from '../../src/bar/WaveformBar.astro';
+import type { WaveformBarConfig, WaveformBarProps } from '../../src/bar/types';
 
 const WaveformBar = WaveformBarRaw as Parameters<
 	AstroContainer['renderToString']

@@ -8,7 +8,7 @@
  * site: the prop renders, the option never applies.
  */
 import { describe, it, expect } from 'vitest';
-import pkg from '../package.json';
+import pkg from '../../package.json';
 
 /** `^1.23.0` → `[1, 23, 0]`. */
 const floor = (range: string): number[] => {
@@ -30,7 +30,12 @@ describe('core peer range', () => {
 		//   data-seek-value-text, data-unknown-track-text, … 1.20.0
 		//   data-waveform-gradient                      1.18.0
 		//   data-seek-handle                            1.17.0
-		expect(pkg.peerDependencies['@arraypress/waveform-player']).toBe('^1.23.0');
+		// One package.json now serves all four components, so the declared
+		// floor is the highest any of them needs (1.24.5, set by the playlist
+		// and sounds cores; see their peer-ranges tests). This component alone
+		// needs 1.23.0, so the floor must be at least that.
+		const peer = floor(pkg.peerDependencies['@arraypress/waveform-player']);
+		expect(atLeast(peer, [1, 23, 0]), 'peer floor below 1.23.0').toBe(true);
 	});
 
 	it('develops against a core at least as new as the peer floor', () => {

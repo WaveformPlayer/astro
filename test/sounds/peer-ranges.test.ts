@@ -9,7 +9,7 @@
  * `@arraypress/waveform-player@1.24.5`.
  */
 import { describe, it, expect } from 'vitest';
-import pkg from '../package.json';
+import pkg from '../../package.json';
 
 /** The lowest version a range accepts: `^x.y.z`, or a `||` union of them. */
 const floor = (range: string): number[] => {

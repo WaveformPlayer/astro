@@ -10,7 +10,7 @@
  * signature, so a typo'd prop is an error).
  */
 import type { WaveformSoundsOptions } from '@arraypress/waveform-sounds';
-import type { WaveformSoundsProps, NotForwardedOption } from '../src/types';
+import type { WaveformSoundsProps, NotForwardedOption } from '../../src/sounds/types';
 
 type Equal<A, B> =
 	(<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;

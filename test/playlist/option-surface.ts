@@ -19,8 +19,8 @@
 /// <reference types="astro/client" />
 // The installed cores' declaration files, as text. Relative paths (not the
 // package specifiers) because neither core exports `./index.d.ts`.
-import playerDts from '../node_modules/@arraypress/waveform-player/index.d.ts?raw';
-import playlistDts from '../node_modules/@arraypress/waveform-playlist/index.d.ts?raw';
+import playerDts from '../../node_modules/@arraypress/waveform-player/index.d.ts?raw';
+import playlistDts from '../../node_modules/@arraypress/waveform-playlist/index.d.ts?raw';
 
 /**
  * The playlist options 1.8.0 declares. Unioned with whatever the installed

@@ -14,9 +14,9 @@ import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import WaveformSoundsRaw from '../src/WaveformSounds.astro';
+import WaveformSoundsRaw from '../../src/sounds/WaveformSounds.astro';
 import type { WaveformSounds as WaveformSoundsClass } from '@arraypress/waveform-sounds';
-import { bindLifecycle, ensurePlayer } from '../src/lifecycle';
+import { bindLifecycle, ensurePlayer } from '../../src/sounds/lifecycle';
 import { installDom } from './dom';
 
 const Component = WaveformSoundsRaw as Parameters<AstroContainer['renderToString']>[0];
@@ -126,7 +126,7 @@ describe('ensurePlayer — never replaces the page\'s player', () => {
 	});
 
 	it('the client script loads the player by dynamic import, behind ensurePlayer', () => {
-		const src = readFileSync(resolve(process.cwd(), 'src/client.ts'), 'utf8');
+		const src = readFileSync(resolve(process.cwd(), 'src/sounds/client.ts'), 'utf8');
 		expect(src).not.toMatch(/^import\s+['"]@arraypress\/waveform-player/m);
 		expect(src).toMatch(/ensurePlayer\(\(\) => import\('@arraypress\/waveform-player\/no-autoinit'\)\)/);
 	});
