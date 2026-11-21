@@ -1,12 +1,12 @@
 /**
  * @module types
  * @description
- * Public TypeScript types for `@arraypress/waveform-player-astro`.
+ * Public TypeScript types for `@arraypress/waveform-astro/player`.
  *
  * The shared option surface — visual styles, colour presets, audio modes,
  * markers, peaks, and the full per-option list — is owned by the core
- * `@arraypress/waveform-player` library, which ships hand-authored type
- * declarations (`index.d.ts`). This wrapper re-exports those shared types
+ * `@arraypress/waveform-player` library, whose type declarations are
+ * generated from its TypeScript source (2.0). This wrapper re-exports those shared types
  * verbatim (so consumers can keep importing them from this package) and
  * derives its component prop interface from the core's
  * {@link WaveformPlayerOptions} rather than re-declaring it. That keeps the
@@ -28,8 +28,8 @@
 import type { WaveformPlayerOptions } from '@arraypress/waveform-player';
 
 /**
- * Shared option types, re-exported from the core library so consumers can
- * continue to import them from `@arraypress/waveform-player-astro`:
+ * Shared option and event types, re-exported from the core library so
+ * consumers can import them from this sub-path:
  *
  * ```ts
  * import type {
@@ -39,17 +39,31 @@ import type { WaveformPlayerOptions } from '@arraypress/waveform-player';
  * } from '@arraypress/waveform-player-astro';
  * ```
  *
- * The core's `index.d.ts` is the single source of truth for their shape —
- * this wrapper no longer maintains parallel copies that can drift.
+ * The core's declarations are the single source of truth for their shape —
+ * this wrapper maintains no parallel copies that can drift. The event
+ * detail types describe the `waveformplayer:*` DOM events every player
+ * dispatches on its container (the core also types them on
+ * `DocumentEventMap`, so `document.addEventListener('waveformplayer:seek', …)`
+ * is typed without importing anything).
  */
 export type {
 	WaveformStyle,
 	ColorPreset,
 	AudioMode,
 	AudioPreload,
+	AudioCrossOrigin,
 	ButtonAlign,
 	WaveformMarker,
 	WaveformPeaks,
+	WaveformPlayerEventMap,
+	WaveformLifecycleEventDetail,
+	WaveformEndedEventDetail,
+	WaveformTimeUpdateEventDetail,
+	WaveformErrorEventDetail,
+	WaveformSeekEventDetail,
+	WaveformRateChangeEventDetail,
+	WaveformVolumeChangeEventDetail,
+	WaveformLoopEventDetail,
 } from '@arraypress/waveform-player';
 
 /**
@@ -57,8 +71,12 @@ export type {
  *
  * Inherits every construction option from the core library's
  * {@link WaveformPlayerOptions} (including `accessibleSeek`, `seekLabel`,
- * `barRadius`, and the gradient-array forms of `waveformColor` /
- * `progressColor`) and layers on the Astro-specific extras. Three groups of
+ * `barRadius`, the gradient-array forms of `waveformColor` /
+ * `progressColor`, and the 2.0 options: `duration`, `lazy`, `loop`,
+ * `showLoop`, `loopLabel`, `showVolume`, `volume`, `volumeLabel`,
+ * `muteLabel`, `showDownload`, `downloadUrl`, `downloadName`,
+ * `downloadLabel`; `waveform` also takes compact `wp1:` peaks) and layers on
+ * the Astro-specific extras. Three groups of
  * core options are deliberately removed:
  *
  *  - `url` — optional on the core options, but **required** here (the
@@ -75,7 +93,9 @@ export type {
  *    Astro component emits static HTML plus `data-*` attributes with
  *    nothing to attach a runtime callback to — typed, they'd type-check and
  *    then silently do nothing. Consumers wire lifecycle handling via the
- *    DOM `waveformplayer:*` events instead; lock-screen skip buttons need a
+ *    bubbling `waveformplayer:*` DOM events instead (`play`, `pause`,
+ *    `ended`, `timeupdate`, and 2.0's `seek`, `ratechange`, `volumechange`,
+ *    `loop`, …); lock-screen skip buttons need a
  *    player constructed in client JS (or `@arraypress/waveform-bar` /
  *    `-playlist`, which supply them).
  *
@@ -114,21 +134,6 @@ export interface WaveformPlayerProps
 	// ─────────────────────────────────────────────────────────────────────
 	// Astro-specific extras
 	// ─────────────────────────────────────────────────────────────────────
-
-	/**
-	 * Defer initialisation until the player scrolls into view.
-	 *
-	 * When `true`, the component emits `data-waveform-player-lazy` and
-	 * the bundled `IntersectionObserver` script promotes it to
-	 * `data-waveform-player` once it crosses the viewport (with a 200px
-	 * buffer so audio is decoded ahead of time).
-	 *
-	 * Use this on grids of many previews to avoid spawning N concurrent
-	 * `fetch()` + `decodeAudioData` jobs on page load.
-	 *
-	 * @default false
-	 */
-	lazy?: boolean;
 
 	/**
 	 * DOM id forwarded to the player container. Useful for targeting

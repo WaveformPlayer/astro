@@ -60,3 +60,9 @@ export const onVolume = (e: DocumentEventMap['waveformplayer:volumechange']): bo
 // window.WaveformPlayer is the core's class (src/player/globals.d.ts no longer
 // redeclares it as an optional hand-written shape).
 assert<Equal<Window['WaveformPlayer'], typeof WaveformPlayer>>();
+
+// The event detail types are re-exported from the sub-path.
+import type * as Sub from '../../src/player/index';
+assert<Equal<Sub.WaveformSeekEventDetail, WaveformSeekEventDetail>>();
+assert<Equal<Sub.WaveformLoopEventDetail, WaveformLoopEventDetail>>();
+assert<Equal<Sub.WaveformPlayerProps, WaveformPlayerProps>>();

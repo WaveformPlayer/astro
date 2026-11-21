@@ -1,5 +1,5 @@
 /**
- * @module @arraypress/waveform-player-astro
+ * @module @arraypress/waveform-astro/player
  * @description
  * Public entry point for the Astro wrapper around
  * `@arraypress/waveform-player`.
@@ -8,9 +8,9 @@
  *
  * ```astro
  * ---
- * import WaveformPlayer from '@arraypress/waveform-player-astro';
+ * import WaveformPlayer from '@arraypress/waveform-astro/player';
  * // or, if you prefer the explicit path:
- * import WaveformPlayer from '@arraypress/waveform-player-astro/WaveformPlayer.astro';
+ * import WaveformPlayer from '@arraypress/waveform-astro/player/WaveformPlayer.astro';
  * ---
  * <WaveformPlayer url="/audio/track.mp3" />
  * ```
@@ -22,7 +22,7 @@
  *   WaveformPlayerProps,
  *   WaveformStyle,
  *   WaveformMarker,
- * } from '@arraypress/waveform-player-astro';
+ * } from '@arraypress/waveform-astro/player';
  * ```
  *
  * @see {@link ./WaveformPlayer.astro} for the component implementation
@@ -42,5 +42,15 @@ export type {
 	ColorPreset,
 	AudioMode,
 	AudioPreload,
+	AudioCrossOrigin,
 	ButtonAlign,
+	WaveformPlayerEventMap,
+	WaveformLifecycleEventDetail,
+	WaveformEndedEventDetail,
+	WaveformTimeUpdateEventDetail,
+	WaveformErrorEventDetail,
+	WaveformSeekEventDetail,
+	WaveformRateChangeEventDetail,
+	WaveformVolumeChangeEventDetail,
+	WaveformLoopEventDetail,
 } from './types';
