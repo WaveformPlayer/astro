@@ -22,11 +22,18 @@ core to parse client-side.
 - The cores are **optional peers at `^2.0.0`**: a consumer installs only the
   cores of the sub-paths they import. `astro` peer `^7.4.0` (Astro 6 dropped
   in 2.0). `engines.node >=22.12`.
-- devDependencies on the cores are **`file:../waveform-{player,bar,playlist,sounds}`**,
-  the sibling 2.0 checkouts (branch `ts`), because 2.0 isn't on npm yet. They
-  install as symlinks outside the project root, which is why the drift tests
-  read core files from disk (`test/core-file.ts`) rather than through Vite's
-  `?raw`. Switch them to `^2.0.0` once the cores are published.
+- devDependencies on the cores are the **published `^2.0.0`**, resolved from
+  registry.npmjs.org (no `link: true` lock entries, real directories in
+  `node_modules`). The drift tests read core files from disk next to each
+  core's `package.json` (`test/core-file.ts`): the cores' `exports` block
+  `src/` and `types/`, and it also works for a `file:` symlink, which Vite's
+  `?raw` would refuse.
+- For cross-repo work before a core release, a devDependency can temporarily
+  be `file:../waveform-<name>` (the peer-range tests fail while it is).
+  Switch it back and re-resolve the lock before publishing:
+  `rm -rf node_modules/@arraypress/waveform-<name>` then
+  `npm install --save-dev @arraypress/waveform-<name>@^2.x.y` (a plain
+  `npm install` after editing package.json keeps the `link: true` entry).
 - TypeScript 7, Astro 7.4, Biome 2.6, vitest 5 (all current as of 2026-11-21).
 - ESM and TypeScript source only; no CommonJS and no `typesVersions` (Astro's
   bundler resolution reads `exports` `types` conditions directly).
@@ -123,8 +130,9 @@ hand-written allowlist, and a drift test makes a missed option a red test.
 
 ## Peer-range tests
 `test/<sub-path>/peer-range(s).test.ts` hold each peer at the floor that
-parses what the component emits (all `^2.0.0` now) and check the installed
-devDependency (`test/versions.ts`) is at least that.
+parses what the component emits (all `^2.0.0` now) and check the
+devDependency is a published `^2.x` range at least that floor, and the
+installed version too (`test/versions.ts`).
 
 ## Conventions
 - An omitted prop emits no attribute, so the core's default applies;

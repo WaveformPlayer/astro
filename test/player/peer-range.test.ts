@@ -9,7 +9,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import pkg from '../../package.json';
-import { atLeast, floor, installedVersion, parse } from '../versions';
+import { atLeast, floor, installedVersion, isPublished2x, parse } from '../versions';
 
 const CORE = '@arraypress/waveform-player';
 
@@ -30,8 +30,8 @@ describe('core peer range', () => {
 		expect(pkg.peerDependencies[CORE]).toBe('^2.0.0');
 	});
 
-	it('develops against the sibling checkout, at least as new as the peer floor', () => {
-		expect(pkg.devDependencies[CORE]).toBe('file:../waveform-player');
+	it('develops against the published 2.0 package, at least as new as the peer floor', () => {
+		expect(isPublished2x(pkg.devDependencies[CORE], floor(pkg.peerDependencies[CORE])), pkg.devDependencies[CORE]).toBe(true);
 		expect(atLeast(parse(installedVersion(CORE)), floor(pkg.peerDependencies[CORE]))).toBe(true);
 	});
 });

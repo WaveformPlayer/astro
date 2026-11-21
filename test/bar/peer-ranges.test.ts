@@ -9,12 +9,13 @@
  *     to the player (documented on `WaveformBarTrackData`).
  *   - `@arraypress/waveform-player` ^2.0.0 — waveform-bar 2.0's own peer.
  *
- * Dev dependencies are the sibling 2.0 checkouts (`file:../waveform-*`); the
- * installed versions are held to the same floors.
+ * The repo develops against the published 2.0 packages: each devDependency
+ * is a `^2.x` range at least the peer floor, and the installed versions are
+ * held to the same floors.
  */
 import { describe, expect, it } from 'vitest';
 import pkg from '../../package.json';
-import { atLeast, floor, installedVersion, parse } from '../versions';
+import { atLeast, floor, installedVersion, isPublished2x, parse } from '../versions';
 
 const MIN_FLOORS: Record<string, number[]> = {
 	'@arraypress/waveform-bar': [2, 0, 0],
@@ -36,8 +37,8 @@ describe('package.json — peer floors cover what the wrapper relies on', () => 
 			expect(pkg.peerDependenciesMeta[name as keyof typeof pkg.peerDependenciesMeta]?.optional).toBe(true);
 		});
 
-		it(`the installed devDependency "${name}" is the sibling checkout, at least ^${min.join('.')}`, () => {
-			expect(devs[name]).toBe(`file:../${name.split('/')[1]}`);
+		it(`the devDependency "${name}" is the published ^2.x, installed at least ^${min.join('.')}`, () => {
+			expect(isPublished2x(devs[name], min), `${name}@${devs[name]}`).toBe(true);
 			expect(atLeast(parse(installedVersion(name)), min)).toBe(true);
 		});
 	}
