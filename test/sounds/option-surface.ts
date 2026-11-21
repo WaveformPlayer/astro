@@ -1,26 +1,17 @@
 /**
- * test/option-surface.ts
- * ----------------------
+ * test/sounds/option-surface.ts
+ * -----------------------------
  *
  * The option surface this wrapper has to cover, read from the installed
- * core's hand-written `index.d.ts`: every key of `WaveformSoundsOptions`.
- * The forwarding-drift test checks each one is either forwarded at runtime
- * or listed in its `NOT_FORWARDED` map with a reason.
+ * core's generated declarations: every key of `WaveformSoundsOptions` in
+ * `types/types.d.ts` (2.0 moved the option types there; the hand-written
+ * root `index.d.ts` the 0.x wrapper read is gone). The forwarding-drift test
+ * checks each one is either forwarded at runtime or listed in its
+ * `NOT_FORWARDED` map with a reason.
  */
-/// <reference types="node" />
-// Read from disk rather than through Vite's `?raw`: the core is a `file:`
-// symlink until it's published, and Vite refuses `?raw` outside the project
-// root. A relative path, not the package specifier: the core doesn't export
-// `./index.d.ts`.
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readCoreFile } from '../core-file';
 
-// From the project root (vitest's cwd) — `import.meta.url` isn't a file: URL
-// under the jsdom environment.
-const soundsDts = readFileSync(
-	resolve(process.cwd(), 'node_modules/@arraypress/waveform-sounds/index.d.ts'),
-	'utf8'
-);
+const soundsDts = readCoreFile('@arraypress/waveform-sounds', 'types/types.d.ts');
 
 /**
  * The property names declared directly on `export interface <name>` —

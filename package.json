@@ -87,18 +87,18 @@
     "url": "https://github.com/sponsors/arraypress"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.12"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
-    "@arraypress/waveform-bar": "^1.11.0",
-    "@arraypress/waveform-player": "^1.24.5",
-    "@arraypress/waveform-playlist": "^1.8.0",
-    "@arraypress/waveform-sounds": "^0.2.0 || ^0.3.0",
-    "astro": "^6.0.0 || ^7.0.0"
+    "@arraypress/waveform-bar": "^2.0.0",
+    "@arraypress/waveform-player": "^2.0.0",
+    "@arraypress/waveform-playlist": "^2.0.0",
+    "@arraypress/waveform-sounds": "^2.0.0",
+    "astro": "^7.4.0"
   },
   "peerDependenciesMeta": {
     "@arraypress/waveform-bar": {
@@ -122,10 +122,10 @@
     "lint": "biome lint"
   },
   "devDependencies": {
-    "@arraypress/waveform-bar": "^1.12.0",
-    "@arraypress/waveform-player": "^1.29.1",
-    "@arraypress/waveform-playlist": "^1.8.0",
-    "@arraypress/waveform-sounds": "^0.2.0",
+    "@arraypress/waveform-bar": "file:../waveform-bar",
+    "@arraypress/waveform-player": "file:../waveform-player",
+    "@arraypress/waveform-playlist": "file:../waveform-playlist",
+    "@arraypress/waveform-sounds": "file:../waveform-sounds",
     "@biomejs/biome": "^2.6.8",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.6",

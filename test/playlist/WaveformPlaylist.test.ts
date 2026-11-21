@@ -464,6 +464,68 @@ describe('<WaveformPlaylist> — forwarded player options', () => {
 	});
 });
 
+// ─── 2.0 player options the playlist passes on ──────────────────────────
+
+describe('<WaveformPlaylist> — 2.0 player options', () => {
+	it('emits showVolume, volume, showDownload and the labels', async () => {
+		const tag = containerTag(
+			await render({
+				tracks: ONE_TRACK,
+				showVolume: true,
+				volume: 0,
+				volumeLabel: 'Lautstärke',
+				muteLabel: 'Stumm',
+				showDownload: true,
+				downloadLabel: 'Get it',
+			})
+		);
+		expect(getAttr(tag, 'data-show-volume')).toBe('true');
+		expect(getAttr(tag, 'data-volume')).toBe('0');
+		expect(getAttr(tag, 'data-volume-label')).toBe('Lautstärke');
+		expect(getAttr(tag, 'data-mute-label')).toBe('Stumm');
+		expect(getAttr(tag, 'data-show-download')).toBe('true');
+		expect(getAttr(tag, 'data-download-label')).toBe('Get it');
+	});
+
+	it('omits them when unset', async () => {
+		const tag = containerTag(await render({ tracks: ONE_TRACK }));
+		for (const attr of [
+			'data-show-volume',
+			'data-volume',
+			'data-volume-label',
+			'data-mute-label',
+			'data-show-download',
+			'data-download-label',
+		]) {
+			expectNoAttr(tag, attr);
+		}
+	});
+
+	it('never puts the stripped or per-track player options on the container', async () => {
+		// loop / showLoop / loopLabel / the player's lazy / duration /
+		// downloadUrl / downloadName are not props (see types.ts); passed
+		// anyway (an untyped caller), they must not become container data-*.
+		const tag = containerTag(
+			await render({
+				tracks: ONE_TRACK,
+				lazy: true,
+				...({ loop: true, showLoop: true, loopLabel: 'L', duration: 9, downloadUrl: '/x', downloadName: 'x' } as object),
+			} as WaveformPlaylistProps)
+		);
+		for (const attr of [
+			'data-loop',
+			'data-show-loop',
+			'data-loop-label',
+			'data-lazy',
+			'data-duration',
+			'data-download-url',
+			'data-download-name',
+		]) {
+			expectNoAttr(tag, attr);
+		}
+	});
+});
+
 // ─── Tracks ──────────────────────────────────────────────────────────────
 
 describe('<WaveformPlaylist> — tracks', () => {
@@ -535,6 +597,43 @@ describe('<WaveformPlaylist> — tracks', () => {
 		expectNoAttr(tracks[2], 'data-waveform');
 		// An empty peaks array would only make the playlist warn and decode.
 		expectNoAttr(tracks[3], 'data-waveform');
+	});
+
+	it('renders a track duration given in seconds or as a clock string (2.0)', async () => {
+		const tracks = trackTags(
+			await render({
+				tracks: [
+					{ url: '/a.mp3', duration: 225 },
+					{ url: '/b.mp3', duration: 92.5 },
+					{ url: '/c.mp3', duration: '3:45' },
+					{ url: '/d.mp3', duration: Number.NaN },
+				],
+			})
+		);
+		expect(getAttr(tracks[0], 'data-duration')).toBe('225');
+		expect(getAttr(tracks[1], 'data-duration')).toBe('92.5');
+		expect(getAttr(tracks[2], 'data-duration')).toBe('3:45');
+		expectNoAttr(tracks[3], 'data-duration');
+	});
+
+	it('renders per-track download targets, and omits them when unset (2.0)', async () => {
+		const tracks = trackTags(
+			await render({
+				tracks: [
+					{ url: '/a.mp3', downloadUrl: '/dl/a.wav', downloadName: 'A (WAV).wav' },
+					{ url: '/b.mp3' },
+				],
+			})
+		);
+		expect(getAttr(tracks[0], 'data-download-url')).toBe('/dl/a.wav');
+		expect(getAttr(tracks[0], 'data-download-name')).toBe('A (WAV).wav');
+		expectNoAttr(tracks[1], 'data-download-url');
+		expectNoAttr(tracks[1], 'data-download-name');
+	});
+
+	it('passes compact wp1: peaks through verbatim (2.0)', async () => {
+		const [track] = trackTags(await render({ tracks: [{ url: '/a.mp3', waveform: 'wp1:M5lm' }] }));
+		expect(getAttr(track, 'data-waveform')).toBe('wp1:M5lm');
 	});
 
 	it('JSON-stringifies per-track markers, omitting the attr for empty/absent', async () => {

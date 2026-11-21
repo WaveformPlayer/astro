@@ -10,7 +10,7 @@
  * `artworkPosition` went missing.
  *
  * Every key of `WaveformPlaylistOptions` and `WaveformPlayerOptions` (read
- * from the installed cores' `index.d.ts`, see `option-surface.ts`) must
+ * from the installed cores' `types/types.d.ts`, see `option-surface.ts`) must
  * either emit its kebab-case `data-*` attribute on the container or be
  * listed in `NOT_FORWARDED` with the reason. Adding an option to a core
  * without deciding which fails this file.
@@ -41,10 +41,17 @@ const NOT_FORWARDED: Record<string, string> = {
 	album: 'per-track: data-album',
 	markers: 'per-track: data-markers',
 	waveform: 'per-track: data-waveform',
+	duration: 'per-track: data-duration (2.0 passes it to the player as seconds)',
+	downloadUrl: 'per-track: data-download-url',
+	downloadName: 'per-track: data-download-name',
 	// Aliases / collisions.
 	style: "alias of waveformStyle; `style` is the container's HTML inline style here",
 	// Owned by the playlist.
 	audioMode: 'the playlist always owns its audio (and strips data-audio-mode)',
+	loop: "stripped by the playlist: a looping track never fires ended, which breaks continuous",
+	showLoop: 'stripped by the playlist: its button turns on that same loop',
+	loopLabel: 'names the loop button, which never exists in a playlist (showLoop is stripped)',
+	lazy: "stripped by the playlist (it loads its own player); this component's own lazy prop defers the whole playlist and emits data-waveform-playlist-lazy, not data-lazy",
 	// Callbacks: server-rendered static HTML has nothing to attach a
 	// function to. Consumers use the player's DOM events instead.
 	...Object.fromEntries(

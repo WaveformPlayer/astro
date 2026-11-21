@@ -1,6 +1,6 @@
 /**
- * test/peer-range.test.ts
- * -----------------------
+ * test/player/peer-range.test.ts
+ * ------------------------------
  *
  * Pins the core peer floor to the oldest core that parses every `data-*`
  * attribute this component emits. An older core ignores the attributes it
@@ -9,38 +9,29 @@
  */
 import { describe, it, expect } from 'vitest';
 import pkg from '../../package.json';
+import { atLeast, floor, installedVersion, parse } from '../versions';
 
-/** `^1.23.0` → `[1, 23, 0]`. */
-const floor = (range: string): number[] => {
-	const m = /^\^(\d+)\.(\d+)\.(\d+)$/.exec(range);
-	if (!m) throw new Error(`expected a caret range, got ${range}`);
-	return m.slice(1).map(Number);
-};
-
-const atLeast = (a: number[], b: number[]): boolean => {
-	for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i];
-	return true;
-};
+const CORE = '@arraypress/waveform-player';
 
 describe('core peer range', () => {
 	it('declares a floor that parses every data-* attribute the component emits', () => {
-		// Newest attribute emitted, and the core release that added it:
-		//   data-cross-origin                           1.23.0  ← the floor
-		//   data-button-radius, data-artwork-position   1.22.0
-		//   data-seek-value-text, data-unknown-track-text, … 1.20.0
-		//   data-waveform-gradient                      1.18.0
-		//   data-seek-handle                            1.17.0
-		// One package.json now serves all four components, so the declared
-		// floor is the highest any of them needs (1.24.5, set by the playlist
-		// and sounds cores; see their peer-ranges tests). This component alone
-		// needs 1.23.0, so the floor must be at least that.
-		const peer = floor(pkg.peerDependencies['@arraypress/waveform-player']);
-		expect(atLeast(peer, [1, 23, 0]), 'peer floor below 1.23.0').toBe(true);
+		// Newest attributes emitted, and the core release that added them:
+		//   data-duration, data-lazy, data-loop, data-show-loop, data-loop-label,
+		//   data-show-volume, data-volume, data-volume-label, data-mute-label,
+		//   data-show-download, data-download-url, data-download-name,
+		//   data-download-label, and wp1: peaks in data-waveform   2.0.0  ← the floor
+		//   data-cross-origin                                      1.23.0
+		// `lazy` in particular is no longer the wrapper's own: a 1.x core would
+		// ignore data-lazy and load every "lazy" player at once.
+		expect(atLeast(floor(pkg.peerDependencies[CORE]), [2, 0, 0]), 'peer floor below 2.0.0').toBe(true);
 	});
 
-	it('develops against a core at least as new as the peer floor', () => {
-		const peer = floor(pkg.peerDependencies['@arraypress/waveform-player']);
-		const dev = floor(pkg.devDependencies['@arraypress/waveform-player']);
-		expect(atLeast(dev, peer), 'devDependency floor below the peer floor').toBe(true);
+	it('is a 2.x range (the 2.0 types and options do not exist in 1.x)', () => {
+		expect(pkg.peerDependencies[CORE]).toBe('^2.0.0');
+	});
+
+	it('develops against the sibling checkout, at least as new as the peer floor', () => {
+		expect(pkg.devDependencies[CORE]).toBe('file:../waveform-player');
+		expect(atLeast(parse(installedVersion(CORE)), floor(pkg.peerDependencies[CORE]))).toBe(true);
 	});
 });

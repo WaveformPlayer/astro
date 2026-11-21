@@ -52,6 +52,8 @@ const SAMPLES: Record<string, unknown> = {
 	progressColor: 'rgb(1, 2, 3)',
 	strings: { count: '{count} geluiden', search: 'Zoek "x" & <y>' },
 	playerOptions: { height: 48, waveformColor: '#ffffff' },
+	// null default: Loop starts on when any sound is a loop; true/false force it.
+	loop: true,
 };
 
 function sample(key: string): unknown {

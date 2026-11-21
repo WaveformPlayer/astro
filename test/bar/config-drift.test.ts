@@ -1,14 +1,17 @@
 /// <reference types="vite/client" />
 /**
- * test/config-drift.test.ts
- * -------------------------
+ * test/bar/config-drift.test.ts
+ * -----------------------------
  *
- * `WaveformBarConfig` is hand-written — `@arraypress/waveform-bar` ships no
- * `.d.ts` — and `config` goes to `window.WaveformBar.init()` verbatim, so
- * nothing else links the type to the bar's real option set. This test
- * parses the bar's `DEFAULTS` object straight out of the installed
- * package (it publishes `src/`) and `WaveformBarConfig` out of
- * `src/types.ts`, and fails when they drift:
+ * `WaveformBarConfig` is hand-written and `config` goes to
+ * `window.WaveformBar.init()` verbatim, so nothing else links the type to the
+ * bar's real option set. (waveform-bar 2.0 generates its own declarations,
+ * but this wrapper keeps its own type: it documents what Astro can serialise
+ * — no function endpoints, no callbacks.) This test parses the bar's
+ * `DEFAULTS` object straight out of the installed package's TypeScript source
+ * (`src/js/core.ts`, which it publishes for its declaration maps but doesn't
+ * export, so it's read from disk — see `../core-file.ts`) and
+ * `WaveformBarConfig` out of `src/bar/types.ts`, and fails when they drift:
  *
  *   1. every `DEFAULTS` key is typed, or listed in `NOT_TYPED` with a reason;
  *   2. every typed key is in `DEFAULTS`, or listed in `NOT_IN_DEFAULTS`;
@@ -21,8 +24,10 @@
  * against the new release.
  */
 import { describe, expect, it } from 'vitest';
-import coreSource from '@arraypress/waveform-bar/src/js/core.js?raw';
 import typesSource from '../../src/bar/types.ts?raw';
+import { readCoreFile } from '../core-file';
+
+const coreSource = readCoreFile('@arraypress/waveform-bar', 'src/js/core.ts');
 
 /**
  * `DEFAULTS` keys deliberately absent from `WaveformBarConfig`.
@@ -45,7 +50,6 @@ const NOT_TYPED: Record<string, string> = {
 /** Typed keys that legitimately aren't in the installed bar's `DEFAULTS`. */
 const NOT_IN_DEFAULTS: Record<string, string> = {
 	mode: 'accepted by init() but deliberately not defaulted — derived from waveform/layout there',
-	barRadius: 'waveform-bar 1.12.0+; harmless once the devDependency is bumped past it',
 };
 
 /**
@@ -152,9 +156,13 @@ function topLevelKeys(source: string, marker: RegExp, what: string): string[] {
 	return keys;
 }
 
-/** Keys of the `const DEFAULTS = { … }` object literal in the bar's core.js. */
+/**
+ * Keys of the `const DEFAULTS = { … }` object literal in the bar's core.ts
+ * (2.0 annotates it — `const DEFAULTS: Required<…> = {` — hence the optional
+ * type annotation in the marker).
+ */
 function defaultsKeys(source: string): string[] {
-	return topLevelKeys(source, /\bconst\s+DEFAULTS\s*=\s*\{/, 'const DEFAULTS = {…} in waveform-bar core.js');
+	return topLevelKeys(source, /\bconst\s+DEFAULTS\b[^=]*=\s*\{/, 'const DEFAULTS = {…} in waveform-bar core.ts');
 }
 
 /** Property names declared on `interface WaveformBarConfig`. */
@@ -185,6 +193,12 @@ describe('WaveformBarConfig ↔ waveform-bar DEFAULTS drift', () => {
 		for (const k of Object.keys(NOT_TYPED)) {
 			expect(defaults, `stale NOT_TYPED entry: ${k}`).toContain(k);
 			expect(typed, `${k} is typed now — drop it from NOT_TYPED`).not.toContain(k);
+		}
+	});
+
+	it('keeps NOT_IN_DEFAULTS honest (every listed key is still absent from DEFAULTS)', () => {
+		for (const k of Object.keys(NOT_IN_DEFAULTS)) {
+			expect(defaults, `${k} is in DEFAULTS now — drop it from NOT_IN_DEFAULTS`).not.toContain(k);
 		}
 	});
 

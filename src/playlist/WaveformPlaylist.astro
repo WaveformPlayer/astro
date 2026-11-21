@@ -68,7 +68,9 @@
  *
  * ## Lazy mounting
  *
- * Passing `lazy` switches the init attribute from `data-waveform-playlist`
+ * This `lazy` is the component's own, not the player's 2.0 `lazy` option
+ * (which the playlist never passes to its player). Passing it switches the
+ * init attribute from `data-waveform-playlist`
  * to `data-waveform-playlist-lazy` and ships a one-time
  * `IntersectionObserver` script that promotes lazy mounts when they
  * approach the viewport. The script self-deduplicates via
@@ -192,6 +194,13 @@ const {
 	singlePlay,
 	playOnSeek,
 	enableMediaSession,
+	// Volume + download link (2.0)
+	showVolume,
+	volume,
+	volumeLabel,
+	muteLabel,
+	showDownload,
+	downloadLabel,
 	// Icons
 	playIcon,
 	pauseIcon,
@@ -239,7 +248,7 @@ const setNum = (key: string, value: number | undefined | null): void => {
 
 /**
  * Helper — set a boolean attr as the string `'true'` / `'false'`.
- * An explicit `'false'` is what turns a flag off: the playlist (1.8.0+)
+ * An explicit `'false'` is what turns a flag off: the playlist
  * treats a present boolean attribute as true unless it is `"false"`, and
  * the player reads `'true'` / `'false'`. Omitted → no attr → core default.
  */
@@ -342,6 +351,18 @@ setBool('data-single-play', singlePlay);
 setBool('data-play-on-seek', playOnSeek);
 setBool('data-enable-media-session', enableMediaSession);
 
+// Volume + download link (2.0). The playlist passes these to its player;
+// each track's download target is per-track (`downloadUrl` / `downloadName`
+// on `tracks`). `loop`, `showLoop` and `lazy` are never forwarded: the
+// playlist strips them (a looping track never ends, which breaks
+// `continuous`), so they aren't props here.
+setBool('data-show-volume', showVolume);
+setNum('data-volume', volume);
+setStr('data-volume-label', volumeLabel ?? null);
+setStr('data-mute-label', muteLabel ?? null);
+setBool('data-show-download', showDownload);
+setStr('data-download-label', downloadLabel ?? null);
+
 // Icons — pass icon markup verbatim. Consumers are responsible for ensuring
 // the HTML they hand us is safe to inject.
 setStr('data-play-icon', playIcon ?? null);
@@ -373,7 +394,15 @@ const trackList = Array.isArray(tracks) ? tracks : [];
 			data-artist={track.artist}
 			data-artwork={track.artwork}
 			data-album={track.album}
-			data-duration={track.duration}
+			data-duration={
+				typeof track.duration === 'number'
+					? Number.isFinite(track.duration)
+						? String(track.duration)
+						: undefined
+					: track.duration
+			}
+			data-download-url={track.downloadUrl}
+			data-download-name={track.downloadName}
 			data-markers={
 				track.markers && track.markers.length > 0
 					? JSON.stringify(track.markers)

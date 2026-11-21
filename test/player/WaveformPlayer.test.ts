@@ -442,61 +442,48 @@ describe('<WaveformPlayer> — behaviour flags', () => {
 	});
 });
 
-// ─── Lazy mounting ───────────────────────────────────────────────────────
+// ─── Lazy (the core's 2.0 `lazy` option) ─────────────────────────────────
 
-describe('<WaveformPlayer> — lazy mount', () => {
-	it('uses data-waveform-player-lazy instead of data-waveform-player when lazy', async () => {
+describe('<WaveformPlayer> — lazy', () => {
+	// 1.x's `lazy` was the wrapper's own: a `data-waveform-player-lazy`
+	// container plus an inline IntersectionObserver that built the player on
+	// approach. 2.0 maps the prop to the core's `lazy` option instead (see the
+	// component's header and test/player/lazy.test.ts, which runs the real core).
+	it('emits data-lazy on an ordinary data-waveform-player container', async () => {
 		const html = await render({ url: '/a.mp3', lazy: true });
-
-		expect(getAttr(html, 'data-waveform-player-lazy')).toBe('');
-		expectNoAttr(html, 'data-waveform-player');
-	});
-
-	it('uses data-waveform-player when lazy is false', async () => {
-		const html = await render({ url: '/a.mp3', lazy: false });
-
 		expect(getAttr(html, 'data-waveform-player')).toBe('');
+		expect(getAttr(html, 'data-lazy')).toBe('true');
 		expectNoAttr(html, 'data-waveform-player-lazy');
 	});
 
-	it('ships the IntersectionObserver script ONLY when lazy is true', async () => {
-		const lazy = await render({ url: '/a.mp3', lazy: true });
-		expect(lazy).toContain('__wfpLazyMountBound');
-		expect(lazy).toContain('IntersectionObserver');
-
-		const eager = await render({ url: '/a.mp3', lazy: false });
-		expect(eager).not.toContain('__wfpLazyMountBound');
-		expect(eager).not.toContain('IntersectionObserver');
+	it('emits data-lazy="false" for an explicit false, and nothing when unset', async () => {
+		expect(getAttr(await render({ url: '/a.mp3', lazy: false }), 'data-lazy')).toBe('false');
+		expectNoAttr(await render({ url: '/a.mp3' }), 'data-lazy');
 	});
 
-	it('waits for window.WaveformPlayer with a bounded retry before giving up', async () => {
-		const lazy = await render({ url: '/a.mp3', lazy: true });
-
-		// The lazy mount must not silently bail when the core script has not
-		// installed window.WaveformPlayer yet — it retries a bounded number
-		// of times (no busy-loop) and then warns.
-		expect(lazy).toContain('MAX_WAIT_ATTEMPTS');
-		expect(lazy).toContain('setTimeout');
-		expect(lazy).toContain('console.warn');
+	it('no longer ships the 1.x observer script', async () => {
+		for (const lazy of [true, false, undefined]) {
+			const html = await render({ url: '/a.mp3', lazy });
+			expect(html).not.toContain('__wfpLazyMountBound');
+			expect(html).not.toContain('IntersectionObserver');
+			expect(html).not.toContain('data-waveform-player-lazy');
+		}
 	});
 });
 
-// ─── View Transitions re-init (non-lazy) ─────────────────────────────────
+// ─── View Transitions re-init ────────────────────────────────────────────
 
 describe('<WaveformPlayer> — View Transitions re-init', () => {
-	it('ships a non-lazy re-init script that re-runs init on astro:page-load', async () => {
-		const eager = await render({ url: '/a.mp3', lazy: false });
-
-		// Non-lazy players must re-initialise after client-side navigation
-		// because the core only auto-inits on DOMContentLoaded.
-		expect(eager).toContain('__wfpInitBound');
-		expect(eager).toContain('astro:page-load');
-		expect(eager).toContain('WaveformPlayer.init()');
-	});
-
-	it('does NOT ship the non-lazy re-init script when lazy is true', async () => {
-		const lazy = await render({ url: '/a.mp3', lazy: true });
-		expect(lazy).not.toContain('__wfpInitBound');
+	it('ships the re-init script that re-runs init on astro:page-load, lazy or not', async () => {
+		// Players must re-initialise after client-side navigation because the
+		// core only auto-inits on DOMContentLoaded. A lazy player is built by
+		// the same init() (it only defers its loading), so it needs it too.
+		for (const lazy of [false, true]) {
+			const html = await render({ url: '/a.mp3', lazy });
+			expect(html).toContain('__wfpInitBound');
+			expect(html).toContain('astro:page-load');
+			expect(html).toContain('WaveformPlayer.init()');
+		}
 	});
 });
 
@@ -607,6 +594,92 @@ describe('<WaveformPlayer> — View Transitions teardown', () => {
 		// No core on the page yet: the handler must not throw.
 		delete run.fakeWindow.WaveformPlayer;
 		expect(() => run.swap()).not.toThrow();
+	});
+});
+
+// ─── 2.0 options ─────────────────────────────────────────────────────────
+
+describe('<WaveformPlayer> — 2.0 options', () => {
+	const NEW_OPTION_ATTRS = [
+		'data-duration',
+		'data-lazy',
+		'data-loop',
+		'data-show-loop',
+		'data-loop-label',
+		'data-show-volume',
+		'data-volume',
+		'data-volume-label',
+		'data-mute-label',
+		'data-show-download',
+		'data-download-url',
+		'data-download-name',
+		'data-download-label',
+	];
+
+	it('emits none of the 13 new attributes when their props are unset', async () => {
+		const html = await render({ url: '/a.mp3' });
+		for (const attr of NEW_OPTION_ATTRS) expectNoAttr(html, attr);
+	});
+
+	it('emits duration in seconds (fractions kept), and drops a non-finite one', async () => {
+		expect(getAttr(await render({ url: '/a.mp3', duration: 187 }), 'data-duration')).toBe('187');
+		expect(getAttr(await render({ url: '/a.mp3', duration: 92.5 }), 'data-duration')).toBe('92.5');
+		expectNoAttr(await render({ url: '/a.mp3', duration: Number.NaN }), 'data-duration');
+		expectNoAttr(await render({ url: '/a.mp3', duration: null }), 'data-duration');
+	});
+
+	it('emits the looping options', async () => {
+		const html = await render({ url: '/a.mp3', loop: true, showLoop: true, loopLabel: 'Repeat' });
+		expect(getAttr(html, 'data-loop')).toBe('true');
+		expect(getAttr(html, 'data-show-loop')).toBe('true');
+		expect(getAttr(html, 'data-loop-label')).toBe('Repeat');
+		expect(getAttr(await render({ url: '/a.mp3', loop: false }), 'data-loop')).toBe('false');
+	});
+
+	it('emits the volume options, including volume={0}', async () => {
+		const html = await render({
+			url: '/a.mp3',
+			showVolume: true,
+			volume: 0.4,
+			volumeLabel: 'Lautstärke',
+			muteLabel: 'Stumm',
+		});
+		expect(getAttr(html, 'data-show-volume')).toBe('true');
+		expect(getAttr(html, 'data-volume')).toBe('0.4');
+		expect(getAttr(html, 'data-volume-label')).toBe('Lautstärke');
+		expect(getAttr(html, 'data-mute-label')).toBe('Stumm');
+		expect(getAttr(await render({ url: '/a.mp3', volume: 0 }), 'data-volume')).toBe('0');
+	});
+
+	it('emits the download options', async () => {
+		const html = await render({
+			url: '/a.mp3',
+			showDownload: true,
+			downloadUrl: '/dl/a.wav',
+			downloadName: 'A (WAV).wav',
+			downloadLabel: 'Get WAV',
+		});
+		expect(getAttr(html, 'data-show-download')).toBe('true');
+		expect(getAttr(html, 'data-download-url')).toBe('/dl/a.wav');
+		expect(getAttr(html, 'data-download-name')).toBe('A (WAV).wav');
+		expect(getAttr(html, 'data-download-label')).toBe('Get WAV');
+	});
+
+	it('passes compact wp1: peaks through verbatim', async () => {
+		const html = await render({ url: '/a.mp3', waveform: 'wp1:AID_' });
+		expect(getAttr(html, 'data-waveform')).toBe('wp1:AID_');
+	});
+
+	it('per-track values follow the url: each render carries its own', async () => {
+		// Astro renders on the server; a new track is a new render, so nothing
+		// can carry over from the previous one (no loadTrack path to miss).
+		const a = await render({ url: '/a.mp3', duration: 100, downloadUrl: '/a.wav', downloadName: 'a.wav' });
+		const b = await render({ url: '/b.mp3', duration: 200 });
+		expect(getAttr(a, 'data-duration')).toBe('100');
+		expect(getAttr(b, 'data-url')).toBe('/b.mp3');
+		expect(getAttr(b, 'data-duration')).toBe('200');
+		expectNoAttr(b, 'data-download-url');
+		expectNoAttr(b, 'data-download-name');
 	});
 });
 
