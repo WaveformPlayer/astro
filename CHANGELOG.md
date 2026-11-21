@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0-next.0
+## 2.0.0 — Unreleased
 
 One package replaces the four 1.x-era Astro wrappers. Components, props,
 emitted markup and client behaviour are unchanged; only the import paths change.
