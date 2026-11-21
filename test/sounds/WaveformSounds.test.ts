@@ -232,6 +232,19 @@ describe('<WaveformSounds> — server-rendered list', () => {
 		expect(innerOf(html)).toBe(renderSounds(SOUNDS, options));
 	});
 
+	it('renders the Loop toggle from the loop prop (a 2.0 bug drew it pressed for loop={false})', async () => {
+		// A list that marks loops starts with the toggle on, unless `loop` says otherwise.
+		const loops = [
+			{ url: '/a.mp3', title: 'A', loop: true },
+			{ url: '/b.mp3', title: 'B' },
+		];
+		const pressed = async (props: WaveformSoundsProps) =>
+			/<button[^>]*data-ws-loop[\s>][^>]*aria-pressed="(\w+)"/.exec(await render(props))?.[1];
+		expect(await pressed({ sounds: loops })).toBe('true');
+		expect(await pressed({ sounds: loops, loop: false })).toBe('false');
+		expect(await pressed({ sounds: SOUNDS, loop: true })).toBe('true');
+	});
+
 	it('renders one row per sound, in order, with the row data the runtime reads', async () => {
 		const html = await render({ sounds: SOUNDS });
 		const r = rows(html);

@@ -27,8 +27,9 @@ Install this package, plus the core(s) for the components you use:
 npm install @arraypress/waveform-astro @arraypress/waveform-player
 ```
 
-Requires Astro 7.4+ and the 2.0 cores (`^2.0.0`), which support Chrome/Edge
-111+, Firefox 114+ and Safari 16.4+. Node 22.12+.
+Requires Astro 7.4+ and the 2.0 cores (`^2.0.0`; `./sounds` needs
+`@arraypress/waveform-sounds` 2.1+), which support Chrome/Edge 111+,
+Firefox 114+ and Safari 16.4+. Node 22.12+.
 
 The cores are optional peer dependencies, so npm won't install the ones you
 don't import. There is no root import (`@arraypress/waveform-astro` on its
@@ -163,6 +164,38 @@ import '@arraypress/waveform-sounds/styles.css';
   columns={['type', 'bpm', 'key']}
 />
 ```
+
+## Custom elements, without a component
+
+The 2.1 playlist and sounds cores also define light-DOM custom elements,
+`<waveform-playlist>` and `<waveform-sounds>`, and an Astro page can write
+those tags directly instead of using the components above. Their attributes
+are the cores' `data-*` options with or without the `data-` prefix,
+and `waveformplayer:*` / `waveformsounds:*` events bubble from the tag:
+
+```astro
+---
+import '@arraypress/waveform-player/styles.css';
+import '@arraypress/waveform-playlist/styles.css';
+import '@arraypress/waveform-sounds/styles.css';
+---
+<waveform-playlist layout="hero" show-volume continuous>
+  <div data-track data-url="/intro.mp3" data-title="Intro" data-duration="187"></div>
+</waveform-playlist>
+
+<waveform-sounds manifest="/sounds.json" page-size="20"></waveform-sounds>
+
+<script>
+  import '@arraypress/waveform-player';
+  import '@arraypress/waveform-playlist'; // registers <waveform-playlist>
+  import '@arraypress/waveform-sounds'; // registers <waveform-sounds>
+</script>
+```
+
+The cores' default entries (and their CDN scripts) register the tags unless
+the page sets `<html data-waveform-autoinit="false">`. The components stay
+the way to get typed props, `sounds` rendered on the server, and ClientRouter
+handling.
 
 ## Documentation
 

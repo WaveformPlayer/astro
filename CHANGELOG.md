@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+For the 2.1 cores (`@arraypress/waveform-player`, `-playlist` and `-sounds`
+2.1.0; `-bar` stays 2.0).
+
+### Fixed — sounds (`./sounds`)
+- **`loop={false}` rendered the Loop toggle pressed**, until the runtime
+  flipped it: the server `renderSounds` call didn't pass `loop`. The render
+  options now come from the core's `pickRenderOptions()`
+  (`@arraypress/waveform-sounds/render`) instead of a hand-kept list, so a
+  render option the core adds reaches the server markup without an edit
+  here.
+
+### Changed
+- **Peers**: `@arraypress/waveform-sounds` is `^2.1.0` (`pickRenderOptions`
+  is 2.1). `-player`, `-bar` and `-playlist` stay `^2.0.0`. All four remain
+  optional.
+- README: the 2.1 cores' `<waveform-playlist>` and `<waveform-sounds>`
+  custom elements can be written directly in an Astro page.
+
 ## 2.0.0 — 2026-11-21
 
 One package replaces the four 1.x-era Astro wrappers, and it is built for the

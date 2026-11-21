@@ -54,7 +54,7 @@
  *   <WaveformSounds manifest="/sounds.json" player="strip" pageSize={100} />
  */
 
-import { renderSounds } from '@arraypress/waveform-sounds/render';
+import { pickRenderOptions, renderSounds } from '@arraypress/waveform-sounds/render';
 import type { WaveformSoundsProps } from './types';
 
 const {
@@ -172,25 +172,18 @@ setJson('data-player-options', playerOptions);
  * The list, server-rendered — or nothing, when there are no `sounds` and the
  * runtime is to fetch `manifest` instead. An array (even an empty one) is
  * rendered, matching the core, which only fetches the manifest when it has
- * no `sounds`. The options passed are exactly the ones the renderer reads;
- * the same values are on the container for the runtime.
+ * no `sounds`. The options passed are the ones the core says shape the
+ * markup (`pickRenderOptions`), not a hand-kept list — 2.0's lacked `loop`,
+ * so `loop={false}` drew the Loop toggle pressed until the runtime flipped
+ * it. The same values are on the container for the runtime.
  */
 const inner = Array.isArray(sounds)
 	? renderSounds(sounds, {
+			...pickRenderOptions(Astro.props as WaveformSoundsProps),
 			player: layout,
-			search,
-			filters,
-			sorts,
-			showCount,
-			menuSearch,
 			// The core's own client-render default (idPrefix, else the
 			// container id) — the SSR ids must match what it would build.
 			idPrefix: idPrefix || id || undefined,
-			loopToggle,
-			pageSize,
-			maxTypeChips,
-			columns,
-			strings,
 		})
 	: '';
 ---

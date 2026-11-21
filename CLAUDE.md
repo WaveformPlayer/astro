@@ -19,10 +19,12 @@ core to parse client-side.
   gate before a commit or publish is typecheck + test + lint + test:pack.
 
 ## Dependencies
-- The cores are **optional peers at `^2.0.0`**: a consumer installs only the
+- The cores are **optional peers at `^2.0.0`** (`-sounds` `^2.1.0`, for
+  `pickRenderOptions`): a consumer installs only the
   cores of the sub-paths they import. `astro` peer `^7.4.0` (Astro 6 dropped
   in 2.0). `engines.node >=22.12`.
-- devDependencies on the cores are the **published `^2.0.0`**, resolved from
+- devDependencies on the cores are the **published ranges** (`^2.1.0`; `-bar`
+  `^2.0.0`), resolved from
   registry.npmjs.org (no `link: true` lock entries, real directories in
   `node_modules`). The drift tests read core files from disk next to each
   core's `package.json` (`test/core-file.ts`): the cores' `exports` block
@@ -114,7 +116,9 @@ hand-written allowlist, and a drift test makes a missed option a red test.
 ### `./sounds` — `src/sounds/WaveformSounds.astro`
 - Server-renders with `@arraypress/waveform-sounds/render`; the runtime ADOPTS
   that markup, so it must stay **byte-identical** to `renderSounds` (the SSR
-  tests check). A render-shaping option is passed to `renderSounds` too.
+  tests check). The render options are the core's `pickRenderOptions(Astro.props)`
+  (plus the resolved `player` / `idPrefix`), so a render-shaping option needs
+  no extra edit there.
 - A new core option: destructure + `setStr`/`setNum`/`setBool`/`setList`/`setJson`
   emitting what the core's `readDataOptions` reads.
   `test/sounds/forwarding-drift.test.ts` reads `WaveformSoundsOptions` from

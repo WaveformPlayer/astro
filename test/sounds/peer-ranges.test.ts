@@ -5,10 +5,9 @@
  * The peer floors are load-bearing. This wrapper imports
  * `@arraypress/waveform-sounds/render` (server) and `/no-autoinit` (client)
  * and emits the JSON `data-strings` / `data-player-options` attributes —
- * all first shipped in waveform-sounds 0.1.0. It is now tested against
- * waveform-sounds 2.0 (the release that lines the list up with the 2.0
- * player, whose types moved to `types/types.d.ts`), which needs
- * `@arraypress/waveform-player@2.0.0`.
+ * all first shipped in waveform-sounds 0.1.0. The server render takes its
+ * options from `pickRenderOptions()`, new in waveform-sounds 2.1.0, which
+ * needs `@arraypress/waveform-player@2.0.0`.
  */
 import { describe, it, expect } from 'vitest';
 import pkg from '../../package.json';
@@ -18,8 +17,8 @@ const peers: Record<string, string> = pkg.peerDependencies;
 const devs: Record<string, string> = pkg.devDependencies;
 
 describe('peer dependency floors', () => {
-	it('requires waveform-sounds >= 2.0.0', () => {
-		expect(atLeast(floor(peers['@arraypress/waveform-sounds']), [2, 0, 0])).toBe(true);
+	it('requires waveform-sounds >= 2.1.0 (pickRenderOptions)', () => {
+		expect(atLeast(floor(peers['@arraypress/waveform-sounds']), [2, 1, 0])).toBe(true);
 	});
 
 	it("requires waveform-player >= 2.0.0 (the sounds core's own floor)", () => {

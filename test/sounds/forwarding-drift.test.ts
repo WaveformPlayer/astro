@@ -157,7 +157,7 @@ describe('the runtime adopts the server-rendered markup', () => {
 		expect(el.querySelector('[data-ws-list]')).toBeNull();
 		const inst = new WaveformSounds(el);
 		await inst.ready;
-		expect(fetchMock).toHaveBeenCalledWith('/sounds.json');
+		expect(fetchMock).toHaveBeenCalledWith('/sounds.json', expect.anything());
 		expect(inst.sounds.map((s) => s.title)).toEqual(['M1', 'M2']);
 		expect(el.querySelectorAll('[data-ws-list] > [data-ws-index]')).toHaveLength(2);
 	});
