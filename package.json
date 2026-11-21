@@ -1,6 +1,6 @@
 {
   "name": "@arraypress/waveform-astro",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Astro components for WaveformPlayer — player, bar, playlist and sounds, one sub-path each, so you install only the cores you use.",
   "type": "module",
   "files": [
