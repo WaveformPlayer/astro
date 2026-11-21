@@ -96,11 +96,12 @@ import wfpJsUrl from '@arraypress/waveform-player/dist/waveform-player.min.js?ur
 		</section>
 
 		<section>
-			<h2>6. Lazy-mounted grid</h2>
+			<h2>6. Lazy grid</h2>
 			<p>
-				Each player defers decoding until it scrolls into view. The
-				wrapper installs one shared <code>IntersectionObserver</code>
-				the first time it sees a <code>lazy</code> instance.
+				Each player is built at once (title and loading state at full
+				height) but loads its audio and peaks only when it comes within
+				200px of the viewport. The core watches every lazy player with
+				one shared <code>IntersectionObserver</code>.
 			</p>
 			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
 				<WaveformPlayer url="/audio/sample-1.mp3" title="Sample 1" lazy />
@@ -125,5 +126,35 @@ import wfpJsUrl from '@arraypress/waveform-player/dist/waveform-player.min.js?ur
 				height={32}
 			/>
 		</section>
+
+		<section>
+			<h2>8. Known length, compact peaks, no audio before play</h2>
+			<p>
+				<code>preload="none"</code> fetches nothing until play;
+				<code>duration</code> shows the total meanwhile, and
+				<code>wp1:</code> peaks draw the waveform without decoding.
+				Volume, loop and download controls are opt-in.
+			</p>
+			<WaveformPlayer
+				url="/audio/track.mp3"
+				preload="none"
+				duration={187}
+				waveform="wp1:M5lmM5lmM5lm"
+				showVolume
+				showLoop
+				showDownload
+				downloadUrl="/downloads/track.wav"
+			/>
+		</section>
+
+		<script>
+			// No callback props: listen for the core's bubbling DOM events.
+			document.addEventListener('waveformplayer:seek', (e) => {
+				console.log('seek', e.detail.currentTime);
+			});
+			document.addEventListener('waveformplayer:volumechange', (e) => {
+				console.log('volume', e.detail.volume, e.detail.muted);
+			});
+		</script>
 	</body>
 </html>

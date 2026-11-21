@@ -27,6 +27,9 @@ Install this package, plus the core(s) for the components you use:
 npm install @arraypress/waveform-astro @arraypress/waveform-player
 ```
 
+Requires Astro 7.4+ and the 2.0 cores (`^2.0.0`), which support Chrome/Edge
+111+, Firefox 114+ and Safari 16.4+. Node 22.12+.
+
 The cores are optional peer dependencies, so npm won't install the ones you
 don't import. There is no root import (`@arraypress/waveform-astro` on its
 own): each component loads its own core, and a combined entry would need all
@@ -45,6 +48,64 @@ import WaveformPlayer from '@arraypress/waveform-astro/player';
 <WaveformPlayer src="/track.mp3" title="My Song" artist="The Artist" waveformStyle="mirror" />
 ```
 
+Every core option is a prop, emitted as its `data-*` attribute. The 2.0
+options:
+
+| Prop | Attribute | |
+| --- | --- | --- |
+| `duration` | `data-duration` | Track length in seconds, shown as the total until the audio's metadata arrives (with `preload="none"`, until play) |
+| `lazy` | `data-lazy` | Build the player now; load audio and peaks, and draw, within 200px of the viewport |
+| `loop`, `showLoop`, `loopLabel` | `data-loop`, … | Loop the track; a loop toggle button and its name |
+| `showVolume`, `volume`, `volumeLabel`, `muteLabel` | `data-show-volume`, … | Mute toggle and volume slider; initial volume (0..1) |
+| `showDownload`, `downloadUrl`, `downloadName`, `downloadLabel` | `data-show-download`, … | A download link (default: the track url and its file name) |
+
+`waveform` takes peaks as an array, a `.json` URL, or compact `wp1:` peaks
+(about a quarter of the size of a JSON array; `@arraypress/waveform-gen`
+writes them):
+
+```astro
+<WaveformPlayer url="/track.mp3" preload="none" duration={187} waveform="wp1:M5lm…" />
+```
+
+`lazy` is the core's option. In 1.x it was this component's own (a
+`data-waveform-player-lazy` container promoted by an inline observer script);
+`<WaveformPlayer lazy>` still defers loading the same way, and the player now
+exists, at full height, before it is on screen.
+
+### Events
+
+There are no callback props: a server-rendered component has no function to
+call. Every player dispatches bubbling, composed `waveformplayer:*`
+CustomEvents on its container, typed on `DocumentEventMap`, so one listener
+hears them all. `detail.player` is the instance.
+
+| Event | `detail` (besides `player`, `url`) |
+| --- | --- |
+| `waveformplayer:ready` / `load` / `play` / `pause` / `destroy` | — |
+| `waveformplayer:ended` | `currentTime`, `duration` |
+| `waveformplayer:timeupdate` | `currentTime`, `duration`, `progress` |
+| `waveformplayer:error` | `error` |
+| `waveformplayer:seek` (2.0) | `currentTime`, `duration` |
+| `waveformplayer:ratechange` (2.0) | `playbackRate` |
+| `waveformplayer:volumechange` (2.0) | `volume`, `muted` |
+| `waveformplayer:loop` (2.0) | `loop`, `start`, `end` |
+| `waveformplayer:next` / `previous` | — (lock-screen skip buttons) |
+| `waveformplayer:request-play` / `request-pause` / `request-seek` | for `audioMode="external"` controllers |
+
+`seek`, `ratechange`, `volumechange` and `loop` come from the player's own
+`<audio>`, so they don't fire with `audioMode="external"`.
+
+```astro
+<script>
+  document.addEventListener('waveformplayer:seek', (e) => {
+    console.log(e.detail.currentTime);
+  });
+</script>
+```
+
+The detail types are exported from `@arraypress/waveform-astro/player`
+(`WaveformSeekEventDetail`, …).
+
 ## Bar
 
 ```astro
@@ -56,6 +117,10 @@ import { WaveformBar, WaveformBarTrigger } from '@arraypress/waveform-astro/bar'
 <!-- Render once, in your root layout -->
 <WaveformBar />
 ```
+
+A trigger's `duration` may be seconds (`187`) or a clock string (`'3:07'`);
+waveform-bar 2.0 shows it and passes it to the player. `waveform` takes
+compact `wp1:` peaks too.
 
 ## Playlist
 
@@ -72,6 +137,14 @@ import wfplJsUrl from '@arraypress/waveform-playlist/dist/waveform-playlist.js?u
 
 <WaveformPlaylist tracks={[{ url: '/a.mp3', title: 'A', artist: 'Artist' }]} />
 ```
+
+Per track: `duration` (seconds or `'3:45'`, shown in the list and passed to
+the player), `downloadUrl` / `downloadName` (with `showDownload` on the
+playlist), and `waveform` (an array, a URL or `wp1:` peaks). The playlist
+passes `showVolume`, `volume`, `showDownload` and the labels to its player;
+it never passes `loop`, `showLoop` or the player's `lazy`, so those aren't
+props. The playlist's own `lazy` prop defers building the whole playlist
+until it nears the viewport.
 
 ## Sounds
 
