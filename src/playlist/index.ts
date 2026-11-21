@@ -1,5 +1,5 @@
 /**
- * @module @arraypress/waveform-playlist-astro
+ * @module @arraypress/waveform-astro/playlist
  * @description
  * Public entry point for the Astro wrapper around
  * `@arraypress/waveform-playlist`.
@@ -8,9 +8,9 @@
  *
  * ```astro
  * ---
- * import WaveformPlaylist from '@arraypress/waveform-playlist-astro';
+ * import WaveformPlaylist from '@arraypress/waveform-astro/playlist';
  * // or, if you prefer the explicit path:
- * import WaveformPlaylist from '@arraypress/waveform-playlist-astro/WaveformPlaylist.astro';
+ * import WaveformPlaylist from '@arraypress/waveform-astro/playlist/WaveformPlaylist.astro';
  * ---
  * <WaveformPlaylist
  *   tracks={[{ url: '/audio/track.mp3', title: 'My Track' }]}
@@ -25,7 +25,7 @@
  *   WaveformPlaylistTrackInput,
  *   WaveformPlaylistOptions,
  *   WaveformStyle,
- * } from '@arraypress/waveform-playlist-astro';
+ * } from '@arraypress/waveform-astro/playlist';
  * ```
  *
  * @see {@link ./WaveformPlaylist.astro} for the component implementation

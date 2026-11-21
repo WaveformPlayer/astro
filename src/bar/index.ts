@@ -1,5 +1,5 @@
 /**
- * @module @arraypress/waveform-bar-astro
+ * @module @arraypress/waveform-astro/bar
  * @description
  * Public entry point for the Astro wrappers around
  * `@arraypress/waveform-bar`.
@@ -16,9 +16,9 @@
  *
  * ```astro
  * ---
- * import { WaveformBar, WaveformBarTrigger } from '@arraypress/waveform-bar-astro';
+ * import { WaveformBar, WaveformBarTrigger } from '@arraypress/waveform-astro/bar';
  * // or the explicit subpath form:
- * import WaveformBar from '@arraypress/waveform-bar-astro/WaveformBar.astro';
+ * import WaveformBar from '@arraypress/waveform-astro/bar/WaveformBar.astro';
  * ---
  * ```
  *
@@ -37,7 +37,7 @@
  *   RepeatMode,
  *   TriggerMode,
  *   WaveformStyle,
- * } from '@arraypress/waveform-bar-astro';
+ * } from '@arraypress/waveform-astro/bar';
  * ```
  */
 

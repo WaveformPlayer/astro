@@ -1,7 +1,7 @@
 /**
  * @module types
  * @description
- * Public TypeScript types for `@arraypress/waveform-playlist-astro`.
+ * Public TypeScript types for `@arraypress/waveform-astro/playlist`.
  *
  * The shared option surfaces are owned by the two core libraries, whose
  * type declarations are generated from their TypeScript source (2.0):

@@ -36,7 +36,7 @@ import type { WaveformPlayerOptions } from '@arraypress/waveform-player';
  *   WaveformStyle,
  *   WaveformMarker,
  *   WaveformPeaks,
- * } from '@arraypress/waveform-player-astro';
+ * } from '@arraypress/waveform-astro/player';
  * ```
  *
  * The core's declarations are the single source of truth for their shape —

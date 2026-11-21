@@ -1,19 +1,19 @@
 /**
- * @module @arraypress/waveform-sounds-astro
+ * @module @arraypress/waveform-astro/sounds
  * @description
  * Public entry point for the Astro wrapper around
  * `@arraypress/waveform-sounds`.
  *
  * ```astro
  * ---
- * import WaveformSounds from '@arraypress/waveform-sounds-astro';
- * // or: import WaveformSounds from '@arraypress/waveform-sounds-astro/WaveformSounds.astro';
+ * import WaveformSounds from '@arraypress/waveform-astro/sounds';
+ * // or: import WaveformSounds from '@arraypress/waveform-astro/sounds/WaveformSounds.astro';
  * ---
  * <WaveformSounds manifest="/sounds.json" />
  * ```
  *
  * ```ts
- * import type { WaveformSoundsProps, SoundInput } from '@arraypress/waveform-sounds-astro';
+ * import type { WaveformSoundsProps, SoundInput } from '@arraypress/waveform-astro/sounds';
  * ```
  *
  * @see {@link ./WaveformSounds.astro} for the component implementation
