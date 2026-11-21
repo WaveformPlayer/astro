@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 — Unreleased
+## 2.0.0 — 2026-11-21
 
 One package replaces the four 1.x-era Astro wrappers, and it is built for the
 2.0 cores (`@arraypress/waveform-player`, `-bar`, `-playlist` and `-sounds`
