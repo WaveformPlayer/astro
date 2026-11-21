@@ -1,0 +1,137 @@
+{
+  "name": "@arraypress/waveform-astro",
+  "version": "2.0.0-next.0",
+  "description": "Astro components for WaveformPlayer — player, bar, playlist and sounds, one sub-path each, so you install only the cores you use.",
+  "type": "module",
+  "files": [
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "exports": {
+    "./player": {
+      "types": "./src/player/index.ts",
+      "default": "./src/player/index.ts"
+    },
+    "./player/WaveformPlayer.astro": "./src/player/WaveformPlayer.astro",
+    "./player/types": {
+      "types": "./src/player/types.ts",
+      "default": "./src/player/types.ts"
+    },
+    "./bar": {
+      "types": "./src/bar/index.ts",
+      "default": "./src/bar/index.ts"
+    },
+    "./bar/WaveformBar.astro": "./src/bar/WaveformBar.astro",
+    "./bar/WaveformBarTrigger.astro": "./src/bar/WaveformBarTrigger.astro",
+    "./bar/types": {
+      "types": "./src/bar/types.ts",
+      "default": "./src/bar/types.ts"
+    },
+    "./playlist": {
+      "types": "./src/playlist/index.ts",
+      "default": "./src/playlist/index.ts"
+    },
+    "./playlist/WaveformPlaylist.astro": "./src/playlist/WaveformPlaylist.astro",
+    "./playlist/types": {
+      "types": "./src/playlist/types.ts",
+      "default": "./src/playlist/types.ts"
+    },
+    "./sounds": {
+      "types": "./src/sounds/index.ts",
+      "default": "./src/sounds/index.ts"
+    },
+    "./sounds/WaveformSounds.astro": "./src/sounds/WaveformSounds.astro",
+    "./sounds/types": {
+      "types": "./src/sounds/types.ts",
+      "default": "./src/sounds/types.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "keywords": [
+    "astro",
+    "astro-component",
+    "withastro",
+    "audio",
+    "audio-player",
+    "player",
+    "waveform",
+    "waveform-visualization",
+    "audio-visualization",
+    "playlist",
+    "chapters",
+    "podcast",
+    "podcast-player",
+    "queue",
+    "persistent-player",
+    "bottom-bar",
+    "samples",
+    "sample-pack",
+    "sound-browser",
+    "media-session",
+    "web-audio"
+  ],
+  "author": "ArrayPress",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WaveformPlayer/astro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WaveformPlayer/astro/issues"
+  },
+  "homepage": "https://waveformplayer.com",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/arraypress"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "peerDependencies": {
+    "@arraypress/waveform-bar": "^1.11.0",
+    "@arraypress/waveform-player": "^1.24.5",
+    "@arraypress/waveform-playlist": "^1.8.0",
+    "@arraypress/waveform-sounds": "^0.2.0 || ^0.3.0",
+    "astro": "^6.0.0 || ^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@arraypress/waveform-bar": {
+      "optional": true
+    },
+    "@arraypress/waveform-player": {
+      "optional": true
+    },
+    "@arraypress/waveform-playlist": {
+      "optional": true
+    },
+    "@arraypress/waveform-sounds": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:pack": "node scripts/pack-check.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint"
+  },
+  "devDependencies": {
+    "@arraypress/waveform-bar": "^1.12.0",
+    "@arraypress/waveform-player": "^1.29.1",
+    "@arraypress/waveform-playlist": "^1.8.0",
+    "@arraypress/waveform-sounds": "^0.2.0",
+    "@biomejs/biome": "^2.6.8",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.6",
+    "astro": "^7.4.13",
+    "jsdom": "^31.0.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1"
+  }
+}
