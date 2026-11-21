@@ -432,7 +432,7 @@ setStr('data-pause-icon', pauseIcon ?? null);
 
 		document.addEventListener('astro:before-swap', function (event) {
 			var WP = window.WaveformPlayer;
-			if (!WP || typeof WP.getAllInstances !== 'function') return;
+			if (!WP) return; // the core's script hasn't loaded (every 2.0 core has getAllInstances)
 			WP.getAllInstances().forEach(function (player) {
 				var container = player && player.container;
 				if (!container || !container.hasAttribute('data-waveform-player')) return;
