@@ -14,7 +14,7 @@
  * vue) apart from the import path.
  */
 import { describe, expectTypeOf, it } from 'vitest';
-import type { WaveformBarConfig } from '../../src/bar/types';
+import type { WaveformBarConfig, WaveformBarTrackData } from '../../src/bar/types';
 
 describe('WaveformBarConfig — types match what the bar forwards to the player', () => {
 	it('accepts waveformGradient with the core player\'s axis union', () => {
@@ -40,5 +40,10 @@ describe('WaveformBarConfig — types match what the bar forwards to the player'
 
 	it('still accepts showTime', () => {
 		expectTypeOf<WaveformBarConfig['showTime']>().toEqualTypeOf<boolean | undefined>();
+	});
+
+	it('takes a track duration as seconds or a clock string, and wp1: peaks as a string', () => {
+		expectTypeOf<WaveformBarTrackData['duration']>().toEqualTypeOf<string | number | undefined>();
+		expectTypeOf<'wp1:M5lm'>().toExtend<NonNullable<WaveformBarTrackData['waveform']>>();
 	});
 });

@@ -237,6 +237,11 @@ describe('<WaveformBarTrigger> — array props', () => {
 		expect(getAttr(html, 'data-wb-waveform')).toBe('/peaks/track.json');
 	});
 
+	it('passes compact wp1: peaks through verbatim (waveform-bar 2.0 decodes them)', async () => {
+		const html = await render({ url: '/a.mp3', waveform: 'wp1:M5lm' });
+		expect(getAttr(html, 'data-wb-waveform')).toBe('wp1:M5lm');
+	});
+
 	it('JSON-stringifies the markers array', async () => {
 		const markers = [
 			{ time: 0, label: 'Intro' },

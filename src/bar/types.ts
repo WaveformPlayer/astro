@@ -1,7 +1,12 @@
 /**
  * @module types
  * @description
- * Public TypeScript types for `@arraypress/waveform-bar-astro`.
+ * Public TypeScript types for `@arraypress/waveform-astro/bar`.
+ *
+ * Hand-written, although waveform-bar 2.0 generates its own declarations:
+ * these describe what an Astro page can pass (JSON-serialisable config, no
+ * function endpoints or callbacks), and `test/bar/config-drift.test.ts`
+ * keeps the key set in step with the bar's `DEFAULTS`.
  *
  * Two component shapes:
  *
@@ -175,9 +180,7 @@ export interface WaveformBarConfig {
 	showVolume?: boolean;
 	/** Show the mute toggle. @default true */
 	showMute?: boolean;
-	/** Show the current / total time readout. `false` hides it
-	 *  (waveform-bar 1.12.0+; older bars ignored this and always showed
-	 *  it). @default true */
+	/** Show the current / total time readout. `false` hides it. @default true */
 	showTime?: boolean;
 	/** Make the title clickable — when true the title links to the
 	 *  track's `data-wb-link`. @default true */
@@ -227,8 +230,7 @@ export interface WaveformBarConfig {
 
 	/**
 	 * Rounded bar-cap radius in pixels. `0` = square caps; `null` keeps
-	 * the underlying player's default. Requires waveform-bar 1.12.0+
-	 * (older bars ignore it).
+	 * the underlying player's default.
 	 *
 	 * @default null
 	 */
@@ -443,7 +445,13 @@ export interface WaveformBarTrackData {
 	/** Click-through link when the bar's title is clicked. */
 	link?: string;
 
-	/** Display duration (any free-form string — `'3:45'`, `'1m 32s'`). */
+	/**
+	 * The track's length: seconds (`187`) or a clock string (`'3:07'`,
+	 * `'1:02:03'`). waveform-bar 2.0 shows it in the meta tags (seconds as a
+	 * clock) and passes it to the player as its `duration`, so the bar's
+	 * total time is right before the audio's metadata loads. Any other string
+	 * (`'1m 32s'`) is still shown as written, but not passed to the player.
+	 */
 	duration?: string | number;
 	/** BPM displayed as a chip. */
 	bpm?: string | number;
@@ -455,7 +463,8 @@ export interface WaveformBarTrackData {
 
 	/**
 	 * Pre-computed waveform peaks. Pass a `number[]` of peaks (0..1),
-	 * a JSON file URL, or a CSV string. Saves the bar from decoding
+	 * compact `wp1:` peaks (waveform-bar 2.0 passes them to the player to
+	 * decode), a JSON file URL, or a CSV string. Saves the bar from decoding
 	 * the audio at play time.
 	 */
 	waveform?: number[] | string;

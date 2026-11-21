@@ -1,10 +1,11 @@
 /**
  * @module types
  * @description
- * Public TypeScript types for `@arraypress/waveform-sounds-astro`.
+ * Public TypeScript types for `@arraypress/waveform-astro/sounds`.
  *
  * The option surface is owned by `@arraypress/waveform-sounds`, whose
- * hand-written `index.d.ts` is the single source of truth. This wrapper
+ * declarations (generated from its TypeScript source since 2.0) are the
+ * single source of truth. This wrapper
  * re-exports the shared shapes verbatim and DERIVES its prop interface from
  * the core's {@link WaveformSoundsOptions} rather than re-declaring any
  * option, so a renamed or retyped core option flows through here without an
