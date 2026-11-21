@@ -1,0 +1,58 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": { "includes": ["src/**", "test/**", "examples/**", "scripts/**", "*.ts"] },
+  // Off for 2.0, as in the core: reformatting is its own change, once a
+  // style is chosen.
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  // Without this, Biome lints only an .astro file's frontmatter. It can't
+  // see the template, so every prop used only in markup is reported as
+  // unused, and the <script is:inline> bodies go unchecked. With it, Biome
+  // reads the template too: noUnusedVariables can stay on, and the inline
+  // scripts get linted. It is marked experimental, hence the .astro
+  // override below for the one parser gap that shows up here.
+  "html": { "experimentalFullSupportEnabled": true },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      // 2.0 ships the 1.x components' exact source (src/ is byte-identical
+      // to the four old packages). Every rule below is off because its fix
+      // would change emitted code or shipped source, or because it
+      // contradicts something deliberate. Same policy as the core's 2.0
+      // biome.jsonc. Revisit them together after 2.0, each with its own tests.
+      "style": {
+        "noNonNullAssertion": "off", // deliberate: each `!` marks where the code (or test) relies on setup having run
+        "useTemplate": "off" // the is:inline scripts are ES5 on purpose and reach the browser verbatim
+      },
+      "complexity": {
+        "useOptionalChain": "off", // `a && a.b` and `a?.b` differ when a is 0 or ""; also ES5 inline scripts
+        "useArrowFunction": "off", // the is:inline scripts are ES5 `function` on purpose and reach the browser verbatim
+        "noUselessEmptyExport": "off" // src/bar/globals.d.ts ships as-is; removing `export {}` changes shipped source
+      },
+      "suspicious": {
+        "useIterableCallbackReturn": "off" // expression-bodied forEach callbacks; a block body is different code
+      },
+      "correctness": {
+        "noInnerDeclarations": "off" // fires on `for (var i …)` in an ES5 inline script; the fix changes the shipped script
+      }
+    }
+  },
+  "overrides": [
+    {
+      // Biome reads a <script is:inline> nested in a template expression
+      // ({lazy ? (<script>…</script>) : …}) as JSX text, so the script's
+      // real JS comments are reported as stray text. A parser gap, not a
+      // finding; the suggested fix would wrap them in {} and break the script.
+      "includes": ["**/*.astro"],
+      "linter": { "rules": { "suspicious": { "noCommentText": "off" } } }
+    },
+    {
+      // `(listeners[type] ??= []).push(fn)` in a test's event-target stub:
+      // a deliberate idiom, and the tests are kept as the 1.x packages had them.
+      "includes": ["test/**"],
+      "linter": { "rules": { "suspicious": { "noAssignInExpressions": "off" } } }
+    }
+  ]
+}
