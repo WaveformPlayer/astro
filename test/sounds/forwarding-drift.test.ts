@@ -162,3 +162,46 @@ describe('the runtime adopts the server-rendered markup', () => {
 		expect(el.querySelectorAll('[data-ws-list] > [data-ws-index]')).toHaveLength(2);
 	});
 });
+
+describe('mergeEnharmonicKeys — server render and runtime agree', () => {
+	const ENHARMONIC = [
+		{ url: '/a.mp3', title: 'Sharp', key: 'A#m' },
+		{ url: '/b.mp3', title: 'Flat', key: 'Bbm' },
+		{ url: '/c.mp3', title: 'Other', key: 'C' },
+	];
+	/** The key menu's option values, without "Any key". */
+	const keyMenu = (el: HTMLElement) =>
+		[...el.querySelectorAll<HTMLElement>('[data-ws-menu="key"] [role="option"]')]
+			.map((o) => o.dataset.value)
+			.filter(Boolean);
+
+	it('false: renders the spellings apart on the server and keeps them apart after the runtime adopts it', async () => {
+		const el = await mount({ sounds: ENHARMONIC, mergeEnharmonicKeys: false });
+		expect(el.dataset.mergeEnharmonicKeys).toBe('false');
+		const ssrList = el.querySelector('[data-ws-list]');
+		expect(keyMenu(el)).toEqual(expect.arrayContaining(['A#m', 'Bbm', 'C']));
+		expect(keyMenu(el)).toHaveLength(3);
+		expect(el.querySelector('[data-ws-menu="key"] [data-alt]')).toBeNull();
+
+		const inst = new WaveformSounds(el);
+		await inst.ready;
+		expect(el.querySelector('[data-ws-list]')).toBe(ssrList);
+		expect(inst.options.mergeEnharmonicKeys).toBe(false);
+		expect(keyMenu(el)).toHaveLength(3);
+		expect(keyMenu(el)).toEqual(expect.arrayContaining(['A#m', 'Bbm']));
+		// A filter on one spelling does not find the other.
+		inst.setFilter({ key: 'A#m' });
+		expect(inst.visible.map((s) => s.title)).toEqual(['Sharp']);
+	});
+
+	it('default (merged): one key entry for both spellings, server and runtime', async () => {
+		const el = await mount({ sounds: ENHARMONIC });
+		expect(keyMenu(el)).toHaveLength(2);
+		const inst = new WaveformSounds(el);
+		await inst.ready;
+		expect(keyMenu(el)).toHaveLength(2);
+		const merged = keyMenu(el).find((k) => k !== 'C')!;
+		inst.setFilter({ key: merged });
+		expect(inst.visible.map((s) => s.title).sort()).toEqual(['Flat', 'Sharp']);
+	});
+});

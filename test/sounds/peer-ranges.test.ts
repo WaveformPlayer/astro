@@ -7,7 +7,10 @@
  * and emits the JSON `data-strings` / `data-player-options` attributes —
  * all first shipped in waveform-sounds 0.1.0. The server render takes its
  * options from `pickRenderOptions()`, new in waveform-sounds 2.1.0, which
- * needs `@arraypress/waveform-player@2.0.0`.
+ * needs `@arraypress/waveform-player@2.0.0`. The 2.2.0 markup changed (rows
+ * only while shown, the sounds as one JSON script) and `mergeEnharmonicKeys`
+ * is new in 2.2.0, so the floor is 2.2.0: the runtime must adopt the markup
+ * this renderer emits.
  */
 import { describe, it, expect } from 'vitest';
 import pkg from '../../package.json';
@@ -17,8 +20,8 @@ const peers: Record<string, string> = pkg.peerDependencies;
 const devs: Record<string, string> = pkg.devDependencies;
 
 describe('peer dependency floors', () => {
-	it('requires waveform-sounds >= 2.1.0 (pickRenderOptions)', () => {
-		expect(atLeast(floor(peers['@arraypress/waveform-sounds']), [2, 1, 0])).toBe(true);
+	it('requires waveform-sounds >= 2.2.0 (the 2.2 markup, mergeEnharmonicKeys)', () => {
+		expect(atLeast(floor(peers['@arraypress/waveform-sounds']), [2, 2, 0])).toBe(true);
 	});
 
 	it("requires waveform-player >= 2.0.0 (the sounds core's own floor)", () => {

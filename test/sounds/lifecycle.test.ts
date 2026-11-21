@@ -146,7 +146,9 @@ describe('bindLifecycle — real core, simulated ClientRouter navigation', () =>
 			props: { id, sounds: [{ url: `/${id}.mp3`, title: id }] },
 		});
 		// Only the component's markup; the module script is the bundler's job.
-		const markup = html.replace(/<script[\s\S]*?<\/script>/g, '');
+		// The list's inert JSON script (the sounds, since waveform-sounds 2.2)
+		// is part of the markup and stays.
+		const markup = html.replace(/<script type="module"[\s\S]*?<\/script>/g, '');
 		return persist ? `<div data-astro-transition-persist="${persist}">${markup}</div>` : markup;
 	};
 

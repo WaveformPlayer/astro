@@ -28,7 +28,7 @@ npm install @arraypress/waveform-astro @arraypress/waveform-player
 ```
 
 Requires Astro 7.4+ and the 2.0 cores (`^2.0.0`; `./sounds` needs
-`@arraypress/waveform-sounds` 2.1+), which support Chrome/Edge 111+,
+`@arraypress/waveform-sounds` 2.2+), which support Chrome/Edge 111+,
 Firefox 114+ and Safari 16.4+. Node 22.12+.
 
 The cores are optional peer dependencies, so npm won't install the ones you
@@ -164,6 +164,13 @@ import '@arraypress/waveform-sounds/styles.css';
   columns={['type', 'bpm', 'key']}
 />
 ```
+
+The list is rendered on the server: the toolbar, the rows it starts with
+(the first page), and every sound once as an inert
+`<script type="application/json" data-ws-sounds>`; the runtime adopts that
+markup and renders further rows as they are revealed. Enharmonic keys
+(A#m / Bbm) are one key-menu entry by default; `mergeEnharmonicKeys={false}`
+keeps the spellings apart, on the server and in the browser alike.
 
 ## Custom elements, without a component
 

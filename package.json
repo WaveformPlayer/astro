@@ -1,6 +1,6 @@
 {
   "name": "@arraypress/waveform-astro",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Astro components for WaveformPlayer — player, bar, playlist and sounds, one sub-path each, so you install only the cores you use.",
   "type": "module",
   "files": [
@@ -97,7 +97,7 @@
     "@arraypress/waveform-bar": "^2.0.0",
     "@arraypress/waveform-player": "^2.0.0",
     "@arraypress/waveform-playlist": "^2.0.0",
-    "@arraypress/waveform-sounds": "^2.1.0",
+    "@arraypress/waveform-sounds": "^2.2.0",
     "astro": "^7.4.0"
   },
   "peerDependenciesMeta": {
@@ -125,7 +125,7 @@
     "@arraypress/waveform-bar": "^2.0.0",
     "@arraypress/waveform-player": "^2.1.0",
     "@arraypress/waveform-playlist": "^2.1.0",
-    "@arraypress/waveform-sounds": "^2.1.0",
+    "@arraypress/waveform-sounds": "^2.2.0",
     "@biomejs/biome": "^2.6.8",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.6",

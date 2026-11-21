@@ -12,7 +12,9 @@
  *
  * Given `sounds`, the component renders the whole list on the server with
  * the core's DOM-free renderer (`@arraypress/waveform-sounds/render`) — the
- * toolbar, the filter chips, every row. The browser runtime finds that
+ * toolbar, the filter chips, the rows the list starts with, and every sound
+ * once as JSON (`<script type="application/json" data-ws-sounds>`, inert;
+ * the runtime renders further rows as they are revealed). The browser runtime finds that
  * markup (`[data-ws-list]`) and ADOPTS it rather than rebuilding it, so the
  * list is readable, crawlable and laid out before any script runs.
  *
@@ -84,6 +86,7 @@ const {
 	loop,
 	autoAdvance,
 	arrowAudition,
+	mergeEnharmonicKeys,
 	// ── Objects (JSON) ────────────────────────────────────────────────────
 	strings,
 	playerOptions,
@@ -165,6 +168,7 @@ setNum('data-bar-gap', barGap);
 setBool('data-loop', loop);
 setBool('data-auto-advance', autoAdvance);
 setBool('data-arrow-audition', arrowAudition);
+setBool('data-merge-enharmonic-keys', mergeEnharmonicKeys);
 setJson('data-strings', strings);
 setJson('data-player-options', playerOptions);
 

@@ -82,6 +82,21 @@ function innerOf(html: string): string {
 
 const rows = (html: string): string[] => [...html.matchAll(/<li class="ws-row"[^>]*>/g)].map((m) => m[0]);
 
+/** Each rendered row's title (`.ws-title-text`), in markup order. */
+const rowTitles = (html: string): string[] =>
+	[...html.matchAll(/<span class="ws-title-text">([^<]*)<\/span>/g)].map((m) => decodeEntities(m[1]));
+
+/**
+ * The sounds the runtime reads: since waveform-sounds 2.2 a row carries only
+ * `data-ws-index`, and EVERY sound is in the list's one
+ * `<script type="application/json" data-ws-sounds>`, normalised.
+ */
+function soundData(html: string): Record<string, unknown>[] {
+	const json = /<script type="application\/json" data-ws-sounds>([\s\S]*?)<\/script>/.exec(html)?.[1];
+	expect(json, 'the data-ws-sounds script').toBeTruthy();
+	return JSON.parse(json as string);
+}
+
 // ─── Container ──────────────────────────────────────────────────────────────
 
 describe('<WaveformSounds> — container', () => {
@@ -111,7 +126,7 @@ describe('<WaveformSounds> — container', () => {
 			'data-menu-search', 'data-id-prefix', 'data-url-state', 'data-loop-toggle',
 			'data-page-size', 'data-max-type-chips', 'data-columns', 'data-waveform-style',
 			'data-waveform-color', 'data-progress-color', 'data-bar-width', 'data-bar-gap', 'data-loop', 'data-auto-advance',
-			'data-arrow-audition', 'data-strings', 'data-player-options', 'id',
+			'data-arrow-audition', 'data-merge-enharmonic-keys', 'data-strings', 'data-player-options', 'id',
 		]) {
 			expectNoAttr(tag, name);
 		}
@@ -139,6 +154,7 @@ describe('<WaveformSounds> — options as data-* attributes', () => {
 				loop: true,
 				autoAdvance: true,
 				arrowAudition: false,
+				mergeEnharmonicKeys: false,
 			})
 		);
 		expect(getAttr(tag, 'data-search')).toBe('false');
@@ -147,6 +163,7 @@ describe('<WaveformSounds> — options as data-* attributes', () => {
 		expect(getAttr(tag, 'data-loop')).toBe('true');
 		expect(getAttr(tag, 'data-auto-advance')).toBe('true');
 		expect(getAttr(tag, 'data-arrow-audition')).toBe('false');
+		expect(getAttr(tag, 'data-merge-enharmonic-keys')).toBe('false');
 	});
 
 	it('emits urlState as "true" / "false", or its prefix verbatim', async () => {
@@ -249,13 +266,16 @@ describe('<WaveformSounds> — server-rendered list', () => {
 		const html = await render({ sounds: SOUNDS });
 		const r = rows(html);
 		expect(r).toHaveLength(3);
-		expect(r.map((row) => getAttr(row, 'data-title'))).toEqual(['Kick 01', 'Bass Loop', 'Pad']);
-		expect(getAttr(r[0], 'data-url')).toBe('/p/kick.mp3');
-		expect(getAttr(r[0], 'data-bpm')).toBe('128');
+		expect(r.map((row) => getAttr(row, 'data-ws-index'))).toEqual(['0', '1', '2']);
+		expect(rowTitles(html)).toEqual(['Kick 01', 'Bass Loop', 'Pad']);
+		const data = soundData(html);
+		expect(data.map((s) => s.title)).toEqual(['Kick 01', 'Bass Loop', 'Pad']);
+		expect(data[0].url).toBe('/p/kick.mp3');
+		expect(data[0].bpm).toBe(128);
 		// Keys are normalised to the short canonical form.
-		expect(getAttr(r[0], 'data-key')).toBe('Fm');
-		expect(getAttr(r[1], 'data-duration')).toBe('8');
-		expect(getAttr(r[1], 'data-peaks')).toBeTruthy();
+		expect(data[0].key).toBe('Fm');
+		expect(data[1].duration).toBe(8);
+		expect(data[1].peaks).toBeTruthy();
 		expect(html).toContain('data-ws-list');
 	});
 
@@ -310,8 +330,11 @@ describe('<WaveformSounds> — server-rendered list', () => {
 		// Strip rows carry no canvas; inline rows do.
 		expect(html).not.toContain('ws-canvas');
 		expect(html).toContain('ws-list--strip');
-		// Rows past the page are hidden, not dropped (the runtime pages them).
-		expect(rows(html)[2]).toMatch(/\shidden/);
+		// Only the first page is rendered; the rest travel as data, and the
+		// runtime renders them as they are revealed.
+		expect(rowTitles(html)).toEqual(['Kick 01', 'Bass Loop']);
+		expect(soundData(html)).toHaveLength(3);
+		expect(html).toMatch(/<button[^>]*data-ws-more(?![^>]*\shidden)[^>]*>Show 1 more</);
 	});
 
 	it('uses a type menu instead of chips past maxTypeChips', async () => {
@@ -329,8 +352,8 @@ describe('<WaveformSounds> — server-rendered list', () => {
 		});
 		const [free, paid] = html.split('<li class="ws-row"').slice(1);
 		expect(free).toMatch(/<a class="ws-download" href="\/files\/free-kick\.wav" download/);
-		expect(getAttr(free, 'data-download')).toBe('/files/free-kick.wav');
 		expect(paid).not.toContain('ws-download');
+		expect(soundData(html).map((s) => s.download)).toEqual(['/files/free-kick.wav', undefined]);
 	});
 
 	it('escapes sound text (no markup injection through titles)', async () => {
@@ -365,7 +388,10 @@ describe('<WaveformSounds> — client script', () => {
 	it('ships a processed module script (bundled, external), not an inline one', async () => {
 		const html = await render({ sounds: SOUNDS });
 		expect(html).toMatch(/<script type="module" src="[^"]*WaveformSounds\.astro\?astro&(amp;)?type=script/);
-		expect(html).not.toMatch(/<script(?![^>]*\ssrc=)[^>]*>/);
+		// The only script without a src is the list's inert JSON data
+		// (`type="application/json"` never runs, so a strict CSP is unaffected).
+		expect(html).not.toMatch(/<script(?![^>]*\ssrc=)(?![^>]*\stype="application\/json")[^>]*>/);
+		expect([...html.matchAll(/<script type="application\/json" data-ws-sounds>/g)]).toHaveLength(1);
 	});
 
 	it('is the same script whatever the props (CSP: one hash / one file for every page)', async () => {
